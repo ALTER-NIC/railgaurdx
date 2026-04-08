@@ -37,11 +37,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect authenticated users away from auth pages
+  // Redirect authenticated users away from auth pages and landing page
   const authPaths = ['/login', '/register']
   const isAuthPage = authPaths.some(path => request.nextUrl.pathname === path)
+  const isRoot = request.nextUrl.pathname === '/'
 
-  if (isAuthPage && user) {
+  if ((isAuthPage || isRoot) && user) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
@@ -52,6 +53,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/',
     '/dashboard/:path*',
     '/logs/:path*',
     '/rules/:path*',
