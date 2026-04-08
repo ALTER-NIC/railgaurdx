@@ -713,7 +713,7 @@ export default function LandingPage() {
           <div className="footer-logo">RAILGUARDX © 2026</div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
             <div className="footer-copy">
-              © 2026 Alternic LLC. All rights reserved.
+              © 2026 ALTERNIC LLC. All rights reserved.
             </div>
             <a
               href="mailto:railguardxhq@gmail.com"
