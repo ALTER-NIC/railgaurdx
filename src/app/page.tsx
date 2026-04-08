@@ -683,7 +683,7 @@ export default function LandingPage() {
         <h2 style={{ color: 'var(--white)' }}>
           YOUR AI.
           <br />
-          <span style={{ color: 'var(--red)' }}>ON A LEASH.</span>
+          <span style={{ color: 'var(--white)' }}>ON A LEASH.</span>
           <br />
           FINALLY.
         </h2>
