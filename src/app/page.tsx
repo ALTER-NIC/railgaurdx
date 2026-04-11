@@ -7,13 +7,8 @@ const LOOPS_ENDPOINT = 'https://app.loops.so/api/newsletter-form/cmn3tos2006xo0i
 
 const surveyQuestions = [
   {
-    question: 'What brought you here?',
-    options: [
-      'I\'m building AI agents and worried about safety',
-      'My company needs compliance guardrails',
-      'I saw an AI incident in the news',
-      'Just exploring — curious about AI safety',
-    ],
+    question: 'Do you think a tool like this should exist, and why?',
+    freeText: true,
   },
   {
     question: 'What do you want most from a guardrail tool?',
@@ -23,33 +18,40 @@ const surveyQuestions = [
       'Real-time monitoring and alerts',
       'Easy integration with existing agents',
     ],
+    freeText: true,
   },
   {
-    question: 'What would you pay for peace of mind?',
+    question: 'How much would you pay for a powerful tool like this?',
     options: [
-      'Free tier is enough for now',
       '$49/mo for core protection',
       '$199/mo for enterprise features',
+      '$1,000/mo for advanced scale',
+      '$100,000/mo for full enterprise',
       'Custom pricing for my scale',
     ],
+    freeText: true,
   },
   {
-    question: 'How soon do you need this?',
+    question: 'Where are you coming from?',
     options: [
-      'Yesterday — we already had an incident',
-      'This quarter — we\'re planning ahead',
-      'Exploring for future projects',
-      'Just want to stay informed',
+      'Reddit',
+      'Twitter / X',
+      'LinkedIn',
+      'Instagram',
+      'Friend or word of mouth',
+      'Other',
     ],
+    freeText: true,
   },
   {
-    question: 'Anything else we should know? (optional)',
+    question: 'Anything you\'d like to add or any recommendations for this startup — anything at all?',
     freeText: true,
   },
 ];
 
 export default function LandingPage() {
   const [surveyAnswers, setSurveyAnswers] = useState<Record<number, string>>({});
+  const [freeTextAnswers, setFreeTextAnswers] = useState<Record<number, string>>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [showSurvey, setShowSurvey] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState('');
@@ -115,6 +117,7 @@ export default function LandingPage() {
     setShowSurvey(true);
     setCurrentStep(0);
     setSurveyAnswers({});
+    setFreeTextAnswers({});
   };
 
   const handleCtaSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -144,7 +147,15 @@ export default function LandingPage() {
     setSurveyAnswers((prev) => ({ ...prev, [step]: option }));
   };
 
+  const saveFreeText = () => {
+    const text = freeTextRef.current?.value || '';
+    if (text) {
+      setFreeTextAnswers((prev) => ({ ...prev, [currentStep]: text }));
+    }
+  };
+
   const nextStep = () => {
+    saveFreeText();
     if (currentStep < surveyQuestions.length - 1) {
       setCurrentStep((prev) => prev + 1);
     } else {
@@ -153,12 +164,13 @@ export default function LandingPage() {
   };
 
   const submitSurvey = async () => {
-    const freeText = freeTextRef.current?.value || '';
-    const payload = {
-      email: submittedEmail,
-      ...surveyAnswers,
-      freeText,
-    };
+    const lastFreeText = freeTextRef.current?.value || '';
+    const allFreeText = { ...freeTextAnswers, [currentStep]: lastFreeText };
+    const payload: Record<string, string> = { email: submittedEmail };
+    surveyQuestions.forEach((q, i) => {
+      if (surveyAnswers[i]) payload[`q${i + 1}_selected`] = surveyAnswers[i];
+      if (allFreeText[i]) payload[`q${i + 1}_text`] = allFreeText[i];
+    });
 
     try {
       await fetch(LOOPS_ENDPOINT, {
@@ -191,9 +203,25 @@ export default function LandingPage() {
         >
           {q.question}
         </h3>
-        {q.freeText ? (
+        {q.options && (
+          <div className="survey-options">
+            {q.options.map((opt) => (
+              <button
+                key={opt}
+                type="button"
+                className={`survey-btn${surveyAnswers[currentStep] === opt ? ' selected' : ''}`}
+                onClick={() => selectOption(currentStep, opt)}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        )}
+        {q.freeText && (
           <textarea
+            key={`freetext-${currentStep}`}
             ref={freeTextRef}
+            defaultValue={freeTextAnswers[currentStep] || ''}
             placeholder="Type anything here..."
             style={{
               width: '100%',
@@ -209,19 +237,6 @@ export default function LandingPage() {
               marginBottom: '16px',
             }}
           />
-        ) : (
-          <div className="survey-options">
-            {q.options!.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                className={`survey-btn${surveyAnswers[currentStep] === opt ? ' selected' : ''}`}
-                onClick={() => selectOption(currentStep, opt)}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
         )}
         <button
           type="button"
@@ -282,7 +297,7 @@ export default function LandingPage() {
                 marginBottom: '12px',
               }}
             >
-              You&apos;re on the list.
+              You&apos;re on the list. Seriously, thank you.
             </p>
             <p
               style={{
@@ -291,8 +306,9 @@ export default function LandingPage() {
                 lineHeight: '1.6',
               }}
             >
-              Thanks for answering — this directly shapes what we build.
-              We&apos;ll be in touch soon.
+              This is day one of something real. Your answers directly shape
+              what we build — we don&apos;t take that lightly. We&apos;ll be
+              in touch soon.
             </p>
           </div>
         ) : !showSurvey ? (
