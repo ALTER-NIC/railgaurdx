@@ -7,45 +7,55 @@ const LOOPS_ENDPOINT = 'https://app.loops.so/api/newsletter-form/cmn3tos2006xo0i
 
 const surveyQuestions = [
   {
-    question: 'Do you think a tool like this should exist, and why?',
+    question: 'Do you think this tool needs to exist? If so, for who? If not — why not?',
     freeText: true,
+    placeholder: 'Type anything here...',
   },
   {
-    question: 'What do you want most from a guardrail tool?',
+    question: 'What features should it have or NEED — what are the non-negotiables for you?',
     options: [
-      'Block dangerous actions before they happen',
-      'Audit trail for compliance',
-      'Real-time monitoring and alerts',
-      'Easy integration with existing agents',
+      'Block unauthorized agent actions before they happen',
+      'Prevent duplicate executions and race conditions',
+      'Real-time visibility into everything my agent does',
+      'Instant alerts when something goes wrong',
+      'Data leakage and prompt injection protection',
+      'Compliance audit trail (SOC2, EU AI Act)',
+      'Human approval required for high-risk actions',
+      'Policy config I commit to my repo',
     ],
     freeText: true,
+    placeholder: 'Anything else you\'d add?',
   },
   {
-    question: 'How much would you pay for a powerful tool like this?',
+    question: 'How much would you pay for a powerful tool like this monthly?',
     options: [
-      '$49/mo for core protection',
-      '$199/mo for enterprise features',
-      '$1,000/mo for advanced scale',
-      '$100,000/mo for full enterprise',
-      'Custom pricing for my scale',
+      'I wouldn\'t pay — it should be free',
+      '$29–$99/mo',
+      '$100–$499/mo',
+      '$500–$999/mo',
+      '$1,000+/mo if it actually solves the problem',
     ],
     freeText: true,
+    placeholder: 'What would make it worth that price to you?',
   },
   {
-    question: 'Where are you coming from?',
+    question: 'Anything you\'d like to add or any recommendations for this startup — anything at all? This is very important and your words really matter.',
+    freeText: true,
+    placeholder: 'Type anything here...',
+  },
+  {
+    question: 'Where did you find this page?',
     options: [
       'Reddit',
       'Twitter / X',
       'LinkedIn',
-      'Instagram',
-      'Friend or word of mouth',
+      'Google search',
+      'Product Hunt / Indie Hackers',
+      'Friend or colleague',
       'Other',
     ],
     freeText: true,
-  },
-  {
-    question: 'Anything you\'d like to add or any recommendations for this startup — anything at all?',
-    freeText: true,
+    placeholder: 'Anything else?',
   },
 ];
 
@@ -189,8 +199,8 @@ export default function LandingPage() {
     const q = surveyQuestions[currentStep];
     return (
       <div>
-        <div className="survey-progress">
-          STEP {currentStep + 1} OF {surveyQuestions.length}
+        <div className="survey-progress" style={{ color: 'var(--white)' }}>
+          QUESTION {currentStep + 1} OF {surveyQuestions.length}
         </div>
         <h3
           style={{
@@ -222,7 +232,7 @@ export default function LandingPage() {
             key={`freetext-${currentStep}`}
             ref={freeTextRef}
             defaultValue={freeTextAnswers[currentStep] || ''}
-            placeholder="Type anything here..."
+            placeholder={q.placeholder || 'Type anything here...'}
             style={{
               width: '100%',
               minHeight: '100px',
